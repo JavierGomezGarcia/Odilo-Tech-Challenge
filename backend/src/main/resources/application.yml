@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: odilo-tech-challenge
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/odilo_tech_challenge}
+    username: ${SPRING_DATASOURCE_USERNAME:odilo}
+    password: ${SPRING_DATASOURCE_PASSWORD:odilo}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: never
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
