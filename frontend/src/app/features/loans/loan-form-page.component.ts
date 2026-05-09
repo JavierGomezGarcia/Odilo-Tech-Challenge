@@ -1,22 +1,28 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { Store } from '@ngxs/store';
-import { firstValueFrom, Subscription } from 'rxjs';
-import { CreateLoanRequest } from '../../models/loan.model';
-import { SetPrefilledIsbn } from '../../state/loan-ui.actions';
-import { ClearLoanStatus, CreateLoan } from '../../state/loan.actions';
-import { LoadBooks } from '../../state/books.actions';
-import { LoanState } from '../../state/loan.state';
-import { LoanUiState } from '../../state/loan-ui.state';
+import { CommonModule } from "@angular/common";
+import { Component, OnDestroy, OnInit, effect, inject } from "@angular/core";
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from "@angular/forms";
+import { ActivatedRoute, RouterLink } from "@angular/router";
+import { Store } from "@ngxs/store";
+import { firstValueFrom, Subscription } from "rxjs";
+import { CreateLoanRequest } from "../../models/loan.model";
+import { SetPrefilledIsbn } from "../../state/loan-ui.actions";
+import { ClearLoanStatus, CreateLoan } from "../../state/loan.actions";
+import { LoadBooks } from "../../state/books.actions";
+import { LoanState } from "../../state/loan.state";
+import { LoanUiState } from "../../state/loan-ui.state";
 
 @Component({
-  selector: 'app-loan-form-page',
+  selector: "app-loan-form-page",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './loan-form-page.component.html',
-  styleUrl: './loan-form-page.component.sass'
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  templateUrl: "./loan-form-page.component.html",
+  styleUrl: "./loan-form-page.component.sass",
 })
 export class LoanFormPageComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
@@ -28,13 +34,23 @@ export class LoanFormPageComponent implements OnInit, OnDestroy {
   protected readonly creating = this.store.selectSignal(LoanState.creating);
   protected readonly success = this.store.selectSignal(LoanState.success);
   protected readonly error = this.store.selectSignal(LoanState.error);
-  protected readonly lastCreated = this.store.selectSignal(LoanState.lastCreatedLoan);
-  protected readonly prefilledIsbn = this.store.selectSignal(LoanUiState.prefilledIsbn);
+  protected readonly lastCreated = this.store.selectSignal(
+    LoanState.lastCreatedLoan,
+  );
+  protected readonly prefilledIsbn = this.store.selectSignal(
+    LoanUiState.prefilledIsbn,
+  );
 
   protected readonly form = this.fb.group({
-    userId: this.fb.control<number | null>(null, [Validators.required, Validators.min(1)]),
-    bookIsbn: this.fb.control<string>('', [Validators.required]),
-    expectedReturnDate: this.fb.control<string>('', [Validators.required, this.futureDateValidator])
+    userId: this.fb.control<number | null>(null, [
+      Validators.required,
+      Validators.min(1),
+    ]),
+    bookIsbn: this.fb.control<string>("", [Validators.required]),
+    expectedReturnDate: this.fb.control<string>("", [
+      Validators.required,
+      this.futureDateValidator,
+    ]),
   });
 
   constructor() {
@@ -53,8 +69,9 @@ export class LoanFormPageComponent implements OnInit, OnDestroy {
 
     this.querySub.add(
       this.route.queryParamMap.subscribe((params) => {
-        const isbn = params.get('isbn');
+        const isbn = params.get("isbn");
 
+        //Clicking from books
         if (isbn) {
           this.store.dispatch(new SetPrefilledIsbn(isbn));
 
@@ -63,7 +80,7 @@ export class LoanFormPageComponent implements OnInit, OnDestroy {
             control.setValue(isbn);
           }
         }
-      })
+      }),
     );
   }
 
@@ -81,7 +98,9 @@ export class LoanFormPageComponent implements OnInit, OnDestroy {
     const payload: CreateLoanRequest = {
       userId: Number(value.userId),
       bookIsbn: String(value.bookIsbn).trim(),
-      expectedReturnDate: new Date(String(value.expectedReturnDate)).toISOString()
+      expectedReturnDate: new Date(
+        String(value.expectedReturnDate),
+      ).toISOString(),
     };
 
     try {
@@ -92,29 +111,36 @@ export class LoanFormPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected controlError(controlName: 'userId' | 'bookIsbn' | 'expectedReturnDate'): string | null {
+  protected controlError(
+    controlName: "userId" | "bookIsbn" | "expectedReturnDate",
+  ): string | null {
     const control = this.form.controls[controlName];
 
     if (!control.touched) {
       return null;
     }
 
-    if (control.hasError('required')) {
-      return 'This field is required.';
+    if (control.hasError("required")) {
+      return "This field is required.";
     }
 
-    if (controlName === 'userId' && control.hasError('min')) {
-      return 'User ID must be greater than 0.';
+    if (controlName === "userId" && control.hasError("min")) {
+      return "User ID must be greater than 0.";
     }
 
-    if (controlName === 'expectedReturnDate' && control.hasError('futureDate')) {
-      return 'Expected return date must be in the future.';
+    if (
+      controlName === "expectedReturnDate" &&
+      control.hasError("futureDate")
+    ) {
+      return "Expected return date must be in the future.";
     }
 
     return null;
   }
 
-  private futureDateValidator(control: AbstractControl): ValidationErrors | null {
+  private futureDateValidator(
+    control: AbstractControl,
+  ): ValidationErrors | null {
     if (!control.value) {
       return null;
     }

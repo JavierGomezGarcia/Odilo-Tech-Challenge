@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, tap, throwError } from 'rxjs';
 import { Book } from '../models/book.model';
@@ -98,6 +99,29 @@ export class BooksState {
   }
 
   private toMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const apiError = error.error;
+
+      if (
+        typeof apiError === 'object' &&
+        apiError !== null &&
+        'message' in apiError &&
+        apiError.message
+      ) {
+        return String(apiError.message);
+      }
+
+      if (typeof apiError === 'string' && apiError.trim()) {
+        return apiError;
+      }
+
+      if (error.message) {
+        return error.message;
+      }
+
+      return 'Unexpected error';
+    }
+
     if (typeof error === 'object' && error !== null && 'message' in error) {
       return String((error as { message?: unknown }).message ?? 'Unexpected error');
     }
