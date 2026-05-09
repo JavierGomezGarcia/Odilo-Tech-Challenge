@@ -1,1 +1,17 @@
-<router-outlet></router-outlet>
+<header class="top-header">
+  <div class="brand">Odilo Tech Challenge</div>
+  <nav class="nav-links">
+    <a
+      routerLink="/books"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Books
+    </a>
+    <a routerLink="/loans/new" routerLinkActive="active">Create Loan</a>
+  </nav>
+</header>
+
+<main class="page-content">
+  <router-outlet></router-outlet>
+</main>

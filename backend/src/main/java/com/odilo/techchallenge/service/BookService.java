@@ -5,10 +5,12 @@ import com.odilo.techchallenge.dto.CreateBookRequest;
 import com.odilo.techchallenge.entity.BookEntity;
 import com.odilo.techchallenge.exception.ConflictException;
 import com.odilo.techchallenge.repository.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class BookService {
@@ -35,11 +37,12 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookResponse> searchByTitle(String title) {
-        List<BookEntity> books = (title == null || title.isBlank())
-                ? bookRepository.findAll()
-                : bookRepository.findByTitleContainingIgnoreCase(title.trim());
-        return books.stream().map(this::toResponse).toList();
+    public Page<BookResponse> searchByTitle(String title, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "title"));
+        Page<BookEntity> books = (title == null || title.isBlank())
+                ? bookRepository.findAll(pageable)
+                : bookRepository.findByTitleContainingIgnoreCase(title.trim(), pageable);
+        return books.map(this::toResponse);
     }
 
     private BookResponse toResponse(BookEntity book) {

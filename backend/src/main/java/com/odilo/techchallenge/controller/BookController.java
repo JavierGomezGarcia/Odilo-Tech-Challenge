@@ -4,7 +4,10 @@ import com.odilo.techchallenge.dto.BookResponse;
 import com.odilo.techchallenge.dto.CreateBookRequest;
 import com.odilo.techchallenge.service.BookService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-
 @RestController
+@Validated
 @RequestMapping("/books")
 public class BookController {
 
@@ -32,7 +33,11 @@ public class BookController {
     }
 
     @GetMapping
-    public List<BookResponse> searchBooks(@RequestParam(required = false) String title) {
-        return bookService.searchByTitle(title);
+    public Page<BookResponse> searchBooks(
+            @RequestParam(required = false) String title,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) int size
+    ) {
+        return bookService.searchByTitle(title, page, size);
     }
 }

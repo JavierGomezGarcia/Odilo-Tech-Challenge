@@ -1,0 +1,49 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Create Loan</h1>
+    </div>
+  </header>
+
+  @if (success()) {
+    <p class="alert success">
+      Loan created successfully for ISBN {{ lastCreated()?.bookIsbn }}.
+    </p>
+  }
+
+  @if (error()) {
+    <p class="alert error">{{ error() }}</p>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label>
+      User ID
+      <input type="number" formControlName="userId" min="1" />
+      @if (controlError("userId")) {
+        <span class="field-error">{{ controlError("userId") }}</span>
+      }
+    </label>
+
+    <label>
+      Book ISBN
+      <input type="text" formControlName="bookIsbn" />
+      @if (controlError("bookIsbn")) {
+        <span class="field-error">{{ controlError("bookIsbn") }}</span>
+      }
+    </label>
+
+    <label>
+      Expected Return Date
+      <input type="datetime-local" formControlName="expectedReturnDate" />
+      @if (controlError("expectedReturnDate")) {
+        <span class="field-error">{{
+          controlError("expectedReturnDate")
+        }}</span>
+      }
+    </label>
+
+    <button type="submit" [disabled]="creating()">
+      {{ creating() ? "Submitting..." : "Create Loan" }}
+    </button>
+  </form>
+</section>
