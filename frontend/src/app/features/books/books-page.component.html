@@ -1,0 +1,77 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Books</h1>
+    </div>
+  </header>
+  <form class="filters" (ngSubmit)="onSearch()">
+    <label for="titleFilter">Search by title</label>
+    <input id="titleFilter" type="text" [(ngModel)]="titleFilter" name="titleFilter" placeholder="Type title..." />
+    <button type="submit">Search</button>
+    <button type="button" class="secondary" (click)="titleFilter = ''; onSearch()">Clear</button>
+  </form>
+
+  @if (loading()) {
+    <p class="status">Loading books...</p>
+  }
+
+  @if (error()) {
+    <p class="status error">{{ error() }}</p>
+  }
+
+  @if (!loading() && books().length === 0) {
+    <p class="status">No books found.</p>
+  }
+
+  @if (books().length > 0) {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ISBN</th>
+            <th>Title</th>
+            <th>Total Copies</th>
+            <th>Available</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (book of books(); track book.isbn) {
+            <tr>
+              <td>{{ book.isbn }}</td>
+              <td>{{ book.title }}</td>
+              <td>{{ book.totalCopies }}</td>
+              <td>{{ book.availableCopies }}</td>
+              <td>
+                <button
+                  type="button"
+                  (click)="goToLoan(book)"
+                  [disabled]="book.availableCopies <= 0"
+                  [class.disabled]="book.availableCopies <= 0"
+                >
+                  Make Loan
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <div class="page-size">
+        <label for="pageSize">Items per page</label>
+        <select id="pageSize" [(ngModel)]="pageSize" name="pageSize" (change)="onPageSizeChange()">
+          <option [ngValue]="5">5</option>
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+          <option [ngValue]="50">50</option>
+        </select>
+      </div>
+      <p>Page {{ page() + 1 }} of {{ totalPages() === 0 ? 1 : totalPages() }} • {{ totalElements() }} items</p>
+      <div class="actions">
+        <button type="button" (click)="previousPage()" [disabled]="page() <= 0 || loading()">Previous</button>
+        <button type="button" (click)="nextPage()" [disabled]="page() >= totalPages() - 1 || loading() || totalPages() === 0">Next</button>
+      </div>
+    </div>
+  }
+</section>
