@@ -44,6 +44,3 @@ coverage/
 # OS
 .DS_Store
 Thumbs.db
-
-# Local-only bootstrap scripts
-local/

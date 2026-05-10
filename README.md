@@ -1,6 +1,6 @@
 # Odilo Tech Challenge
 
-Monorepo with separate frontend and backend applications.
+Monorepo with separate frontend and backend applications for tech interview challenge. The idea behind thsi repo is to be reviewed for a tech interview
 
 ## Structure
 
@@ -24,13 +24,7 @@ Location: `backend/`
 
 1. Install PostgreSQL for Windows (default port `5432`).
 2. Open `SQL Shell (psql)` as `postgres` superuser.
-3. Run:
-
-```sql
-CREATE USER odilo WITH PASSWORD 'odilo';
-CREATE DATABASE odilo_tech_challenge OWNER odilo;
-GRANT ALL PRIVILEGES ON DATABASE odilo_tech_challenge TO odilo;
-```
+3. Run: sql script on local folder
 
 ### Maven Setup (Windows)
 
